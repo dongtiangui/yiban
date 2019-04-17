@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.yiban_application.system.dao.UserInterface">
+
+    <resultMap id="BaseResult" type="com.yiban.yiban_application.javabean.Wall_user">
+        <id column="id" property="id"/>
+        <result column="yb_usernick" property="yb_usernick"/>
+        <result column="yb_schoolname" property="yb_schoolname"/>
+        <result column="yb_money" property="yb_money"/>
+        <result column="yb_userhead" property="yb_userhead"/>
+        <result column="yb_regtime" property="yb_regtime"/>
+        <result column="yb_usertrends" property="yb_usertrends"/>
+        <result column="yb_userassess" property="yb_userassess"/>
+        <association property="role" column="yb_user_role">
+            <id property="role_id" column="role_id"/>
+            <result property="role_name" column="role_name"/>
+        </association>
+    </resultMap>
+
+    <sql id="BaseSql"> id,yb_usernick,yb_schoolname,yb_money,yb_userhead,yb_regtime,
+        yb_usertrends,yb_userassess,yb_user_role
+    </sql>
+
+    <select id="getUser" resultMap="BaseResult" parameterType="java.lang.String">
+
+        SELECT w.id id,w.yb_usernick yb_usernick,w.yb_schoolname yb_schoolname,
+        w.yb_money yb_money,w.yb_regtime yb_regtime,
+        w.yb_userhead yb_userhead,w.yb_usertrends yb_usertrends,w.yb_userassess yb_userassess,
+		w.yb_user_role yb_user_role,
+		r.role_id role_id,r.role_name role_name from t_wall_user w,t_role r
+		where w.yb_user_role=r.role_id and w.yb_usernick=#{name}
+
+    </select>
+
+    <select id="getUserById" resultMap="BaseResult" parameterType="java.lang.String">
+
+    SELECT w.id id,w.yb_usernick yb_usernick,w.yb_schoolname yb_schoolname,
+        w.yb_money yb_money,w.yb_regtime yb_regtime,
+        w.yb_userhead yb_userhead,w.yb_usertrends yb_usertrends,w.yb_userassess yb_userassess,
+		w.yb_user_role yb_user_role,
+		r.role_id role_id,r.role_name role_name from t_wall_user w,t_role r
+		where w.yb_user_role=r.role_id and w.id=#{id}
+
+    </select>
+    
+    <select id="getAllUser" resultMap="BaseResult">
+        SELECT w.id id,w.yb_usernick yb_usernick,w.yb_schoolname yb_schoolname,
+        w.yb_money yb_money,w.yb_regtime yb_regtime,
+        w.yb_userhead yb_userhead,w.yb_usertrends yb_usertrends,w.yb_userassess yb_userassess,
+		w.yb_user_role yb_user_role,
+		r.role_id role_id,r.role_name role_name from t_wall_user w,t_role r
+		where w.yb_user_role=r.role_id
+    </select>
+
+    <select id="userCount" resultType="java.lang.Integer">
+        select count(*) from t_wall_user
+    </select>
+
+    <insert id="insertByUser" parameterType="com.yiban.yiban_application.javabean.Wall_user">
+
+        INSERT INTO t_wall_user(id,yb_usernick,yb_schoolname,yb_money,yb_regtime,yb_userhead,
+        yb_usertrends,yb_userassess,yb_user_role) VALUES
+         (#{id},#{yb_usernick},#{yb_schoolname},#{yb_money},#{yb_regtime},
+         #{yb_userhead},#{yb_usertrends},#{yb_userassess},#{role.role_id})
+    </insert>
+    
+    <update id="updateUserTA">
+    
+        update t_wall_user set yb_usertrends = #{trends},yb_userassess=#{assess}  where id=#{id}
+
+
+    </update>
+
+</mapper>

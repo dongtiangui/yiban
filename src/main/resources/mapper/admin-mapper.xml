@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.yiban_application.system.dao.AdminInterface">
+
+    <resultMap id="BaseResultMap" type="com.yiban.yiban_application.javabean.Sys_admin">
+        <id property="admin_id" column="admin_id"/>
+        <result property="admin_name" column="admin_name"/>
+        <result property="admin_pass" column="admin_pass"/>
+        <result property="admin_role" column="admin_role"/>
+    </resultMap>
+    <select id="getAdmin" resultMap="BaseResultMap">
+
+        select admin_name,admin_pass from t_sys_admin where admin_id=#{id}
+
+    </select>
+
+    <select id="getPass" resultType="java.lang.String" parameterType="java.lang.String">
+
+        select admin_pass from t_sys_admin where admin_name=#{name};
+
+    </select>
+
+    <insert id="insertAdmin" parameterType="com.yiban.yiban_application.javabean.Sys_admin">
+
+        INSERT INTO t_sys_admin(admin_id, admin_name, admin_pass, admin_role) VALUES (#{admin_id},#{admin_name},#{admin_pass},#{admin_role})
+
+    </insert>
+
+    <update id="updateAdmin" parameterType="java.lang.String">
+
+        UPDATE t_sys_admin SET admin_pass= #{newpassword} WHERE admin_name= #{username}
+
+    </update>
+
+</mapper>

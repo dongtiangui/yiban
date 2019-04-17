@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>login</title>
+  <meta content="on" http-equiv="cleartype">
+  <meta name="MobileOptimized" content="320">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="../static/bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="../static/bower_components/font-awesome/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="../static/bower_components/Ionicons/css/ionicons.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../static/dist/css/AdminLTE.min.css">
+</head>
+<body class="hold-transition lockscreen">
+<!-- Automatic element centering -->
+<div class="lockscreen-wrapper">
+  <div class="lockscreen-logo">
+    <a href="#"><b>"易"</b>起聊</a>
+  </div>
+  <!-- User name -->
+  <div th:if="${user_info!=null}" class="lockscreen-name" th:text="${user_info.getYb_usernick()}"></div>
+
+  <!-- START LOCK SCREEN ITEM -->
+  <div class="lockscreen-item">
+    <!-- lockscreen image -->
+    <div class="lockscreen-image">
+      <img th:if="${user_info!=null}" th:src="${user_info.getYb_userhead()}" alt="User Image">
+    </div>
+    <form class="lockscreen-credentials">
+      <div class="input-group">
+        <input type="password" id="password" class="form-control" placeholder="登陆密码">
+        <label for="username">
+        </label>
+        <input th:if="${user_info!=null}" type="text" hidden id="username" th:value="${user_info.getYb_usernick()}">
+        <input th:if="${user_info!=null}" type="text" hidden id="user-id" th:value="${user_info.getId()}">
+        <div class="input-group-btn">
+          <button type="button" class="btn" id="login-btn"><i class="fa fa-arrow-right text-muted"></i></button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <!-- /.lockscreen-item -->
+
+  <div class="text-center">
+    <a class="btn btn-info" th:href="@{/admin-index.html/(session=${user_info.getSession()})}">主页</a>
+  </div>
+  <div class="lockscreen-footer text-center">
+    Copyright &copy; 2019<b></b><br>
+    All rights reserved
+  </div>
+</div>
+<script src="../static/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="../static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+  <script type="text/javascript">
+    $(function () {
+      $('#login-btn').click(function () {
+        $.ajax({
+          url:"/login",
+          type:"post",
+          data:{"username":$('#username').val(),"password":$('#password').val()},
+          success:function (data) {
+            if(data.status===1){
+              window.location.href = "/admin?sessionId="+data.session+"&username="+encodeURI(encodeURI($('#username').val()))+"&userId="+$('#user-id').val();
+              return;
+            }
+            alert(data.meg);
+          },
+          error:function (ex) {
+            alert(ex+"系统错误");
+          }
+        })
+      })
+    })
+  </script>
+</body>
+</html>

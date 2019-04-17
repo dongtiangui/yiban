@@ -1,0 +1,231 @@
+<style>
+  #table-image  thead{background: #5488c4;}
+  #table-image tr:nth-child(even){
+    background:#f4f8fb;
+  }
+</style>
+<section class="content-header">
+  <h1>
+    图片管理
+    <small>Image admin</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> 控制台</a></li>
+    <li class="active">图片管理</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Image Info</h3>
+        </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-secondary" onclick="deleImageAll()">删除</button>
+        </div>
+        <div class="box-body">
+          <table id="table-image" class="table table-hover"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="../../../static/common.js" type="text/javascript"></script>
+
+<script>
+  $('#table-image').bootstrapTable({
+    url: '/resource/ajaximgdata',
+    method: 'get',
+    striped: true,
+    cache: false,
+    toolbar: "#toolbar",
+    pagination: true,
+    sortable: false,
+    sidePagination: "server",
+    pageNumber: 1,
+    pageSize: 10,
+    pageList: [5, 10, 25, 50, 100],
+    minimumCountColumns: 2,
+    clickToSelect: true,
+    uniqueId: "image_id",
+    cardView: false,
+    detailView: false,
+    smartDisplay: false,
+    search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+    strictSearch: true,
+    showColumns: true,                  //是否显示所有的列
+    showRefresh: true,
+    queryParams : function (params) {
+      return {
+        pageSize: params.limit,
+        pageNum: params.offset / params.limit + 1   //页码
+      }
+    },
+    columns: [{
+      checkbox: true,
+      visible: true                  //是否显示复选框
+    },{
+      title: '主键ID',
+      field: 'image_id',
+      align: 'center',
+      sortable: true,
+    }, {
+      field: 'image_size',
+      title: '图片大小',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'image_user',
+      title: '上传用户',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'image_path',
+      title: '图片路径',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'image_url',
+      title: '图片地址',
+      sortable: true,
+      align: 'center',
+      formatter: function (value, row, index) {
+        return "<a href='javascript:;' class='btn btn-danger' onclick=showImage()>图片查看</a>"
+      }
+    }, {
+      field: 'image_type',
+      title: '图片类型',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'image_status',
+      title: '图片状态',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'image_format',
+      title: '图片匹配度',
+      sortable: true,
+      align: 'center',
+      formatter: function (value, row, index) {
+        return "<a href='javascript:;' class='btn btn-info' onclick=showForm()>查看详情</a>"
+      }
+    }, {
+      field: 'image_name',
+      title: '图片名称',
+      sortable: true,
+      align: 'center'
+    },{
+      field: 'price',
+      title: '操作',
+      width: 120,
+      align: 'center',
+      valign: 'middle',
+      formatter: actionFormatter
+      }
+    ]
+  });
+  //操作栏的格式化
+  function actionFormatter(value, row, index) {
+    var id = value;
+    var result = "";
+    result += "<a href='javascript:;' class='btn btn-xs red' onclick=DeleteByIds() title='删除'><span class='glyphicon glyphicon-remove'></span></a>";
+    return result;
+  }
+
+  function DeleteByIds() {
+    var id;
+    var a= $('#table-image').bootstrapTable('getSelections');
+    if(a.length!==1){
+      _confirm_error("请选中一行");
+      return;
+    }
+    id = a[0].image_id;
+    var name = a[0].image_name;
+    _confirm_common({
+      text: "确定删除图片？",
+      confirmButtonText: "确定删除"
+    }, function() {
+      $.ajax({
+        url:"/resource/deleteImageById/"+id+"/"+name,
+        success:function (date) {
+          if (date.status === 200){
+            _confirm_success(date.message);
+            $('#table-image').bootstrapTable('refresh');
+            return;
+          }
+          _confirm_error(date.message);
+        }
+      });
+    });
+  }
+
+  function deleImageAll() {
+    var selected = $("#table-image").bootstrapTable('getSelections');
+    var selected_length = selected.length;
+    if (!selected_length) {
+      _confirm_error('请勾选需要删除的图片！');
+      return;
+    }
+    var ids = "";
+    var names = "";
+    for (var i = 0; i < selected_length; i++) {
+      ids += selected[i].image_id;
+      if (i !== (selected_length - 1)) ids += ",";
+    }
+    for (var k = 0; k < selected_length; k++) {
+      names += selected[k].image_name;
+      if (k !== (selected_length - 1)) names += ",";
+    }
+    _confirm_common({
+      text: "确定删除选中的图片？",
+      confirmButtonText: "确定删除"
+    }, function() {
+      $.post('/resource/deleteAllImage/id', { "ids": ids ,"names":names}, function(r) {
+        if (r.status === 200) {
+          _confirm_success(r.message);
+          $('#table-image').bootstrapTable('refresh');
+        } else {
+          _confirm_error(r.message);
+        }
+      });
+    });
+  }
+  function showImage() {
+    var a= $('#table-image').bootstrapTable('getSelections');
+    if(a.length!==1){
+      _confirm_error("请选中一行");
+      return;
+    }
+    var image = a[0].image_url;
+    swal({
+      title: '图片详情',
+      text: a[0].image_path,
+      imageUrl: image,
+      imageWidth: 400,
+      imageHeight: 200,
+      imageAlt: 'Custom image',
+      animation: false
+    })
+  }
+  function showForm() {
+    var a= $('#table-image').bootstrapTable('getSelections');
+    if(a.length!==1){
+      _confirm_error("请选中一行");
+      return;
+    }
+    const image = a[0].image_format;
+    const imageurl = a[0].image_url;
+    swal({
+      title: '图片标签匹配度',
+      text: image,
+      imageUrl: imageurl,
+      imageWidth: '100%',
+      imageHeight: '100%',
+      imageAlt: 'Custom image',
+      animation: false
+    })
+  }
+</script>

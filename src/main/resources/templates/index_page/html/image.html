@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>image</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../../static/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../../static/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../static/bower_components/Ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="../../../static/dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="../../../static/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+    <link href="../../../static/bower_components/bootstrap-fileinput-master/css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="../../../static/index/framework/viewer.min.css" media="all" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        .images li img{
+            height: 300px;
+        }
+        .swiper-pagination{
+            position: fixed;
+            bottom: 60px;
+            right: 40px;
+            z-index: 99;
+        }
+    </style>
+</head>
+<body>
+<div class="alert alert-danger navbar-fixed-top" style="text-align: center;height: 48px;z-index: 999999" role="alert">
+    精美图片<i class="fa fa-2x fa-file-image-o"></i>
+</div>
+<div style="z-index: 1;position: absolute;width: 100%;height: 100%;top: 10%;overflow-y: scroll">
+    <div class="container" style="padding-top: 10px">
+        <ul class="images text-center list-group" style="list-style: none">
+            <li class="list-group-item" style="opacity: 0.8" th:each="img,imgStat: ${image}">
+                <div style="margin-bottom: 10px;text-align: center;background-color: rgba(255,21,94,0.58);color: white;border-radius: 5px;box-shadow: 2px 4px 4px black">
+                    <p>图片场景匹配度</p>
+                    <span th:each="format:${img.getList()}">
+                    <i class="fa fa-circle text-info"></i>
+                    <span th:text="${format}">
+                    </span>
+                </span>
+                </div>
+                <img th:src="${img.getImage_url()}" class="img-responsive img-thumbnail" style="opacity: 0.9" alt="IMG_0614.JPG">
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="swiper-pagination">
+    <input id="username" hidden th:value="${user_id}">
+    <a data-toggle="modal" data-target="#exampleModalLong" href="" onclick="return false;"><i class="fa fa-3x fa-plus-circle"></i></a>
+</div>
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">上传图片</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!--<p class="alert alert-danger text-center">目前支持为mp4格式视频添加背景音乐(限aac格式)</p>-->
+            <input id="upload" name="upload" multiple type="file" accept="image/**" >
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../../../static/bower_components/jquery/dist/jquery.min.js">
+</script>
+<script src="../../../static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../../../static/index/framework/swiper-4.5.0/dist/js/swiper.min.js"></script>
+<script src="../../../static/index/framework/viewer.min.js"></script>
+<script src="../../../static/index/framework/three/three.min.js"></script>
+<script src="../../../static/index/framework/three/stats.min.js"></script>
+<script src="../../../static/index/framework/three/dat.gui.min.js"></script>
+<script src="../../../static/index.js"></script>
+
+<script src="../../../static/bower_components/bootstrap-fileinput-master/js/fileinput.min.js"></script>
+
+<script src="../../../static/bower_components/bootstrap-fileinput-master/js/plugins/piexif.min.js"></script>
+<!-- optionally if you need a theme like font awesome theme you can include it as mentioned below -->
+<script src="../../../static/bower_components/bootstrap-fileinput-master/themes/fa/theme.js"></script>
+<!-- optionally if you need translation for your language then include  locale file as mentioned below -->
+<script src="../../../static/bower_components/bootstrap-fileinput-master/js/locales/zh.js"></script>
+
+<script>
+    var $image = $('.image');
+    $image.viewer({
+        inline: true,
+        movable:false,
+        toolbar:false,
+        viewed: function() {
+            $image.viewer('zoomTo', 1);
+        }
+    });
+    var viewer = $image.data('viewer');
+    $('.images').viewer();
+
+    $(function () {
+        var imgurl = "";
+        $("#upload").fileinput({
+            language: 'zh',
+            uploadAsync: true,
+            showPreview : true,
+            autoReplace:false,
+            removeFromPreviewOnError:true,
+            uploadUrl:'/file/image?username='+$('#username').val()+'',
+            browseLabel: '上传资源',
+            previewFileIcon: '<i class="fa fa-3x fa-file"></i>',
+            showUpload: true, //是否显示上传按钮
+            showRemove : true, //显示移除按钮
+            browseClass: "btn btn-primary", //按钮样式
+            dropZoneEnabled: false,//是否显示拖拽区域
+            maxFileCount: 5, //表示允许同时上传的最大文件个数
+            enctype: 'multipart/form-data',
+            validateInitialCount:true,
+            msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+            allowedFileTypes: ['image'],
+            previewFileIconSettings: {
+                'jpg': '<i class="fas fa-file-image text-warning"></i>'
+            },
+            previewFileExtSettings: {
+                'jpg': function(ext) {
+                    return ext.match(/(jp?g|png|gif|bmp)$/i);
+                }
+            }
+        });
+        $("#upload").on("fileuploaded", function (event, data, previewId, index) {
+            var  response =  data.response;
+            imgurl+=response.filePath+',';
+            $("#url").val(imgurl);
+        });
+//上传前
+        $('#upload').on('filebatchuploadsuccess', function(event, data, previewId, index) {
+            var form = data.form, files = data.files, extra = data.extra,
+                response = data.response, reader = data.reader;
+        });
+    });
+
+</script>
+<script>
+    function planesFromMesh( vertices, indices ) {
+        var n = indices.length / 3,
+            result = new Array( n );
+
+        for ( var i = 0, j = 0; i < n; ++ i, j += 3 ) {
+
+            var a = vertices[ indices[ j ] ],
+                b = vertices[ indices[ j + 1 ] ],
+                c = vertices[ indices[ j + 2 ] ];
+
+            result[ i ] = new THREE.Plane().
+            setFromCoplanarPoints( a, b, c );
+
+        }
+
+        return result;
+
+    }
+
+    function createPlanes( n ) {
+
+        var result = new Array( n );
+
+        for ( var i = 0; i !== n; ++ i )
+            result[ i ] = new THREE.Plane();
+
+        return result;
+
+    }
+
+    function assignTransformedPlanes( planesOut, planesIn, matrix ) {
+        for ( var i = 0, n = planesIn.length; i !== n; ++ i )
+            planesOut[ i ].copy( planesIn[ i ] ).applyMatrix4( matrix );
+
+    }
+
+    function cylindricalPlanes( n, innerRadius ) {
+
+        var result = createPlanes( n );
+
+        for ( var i = 0; i !== n; ++ i ) {
+
+            var plane = result[ i ],
+                angle = i * Math.PI * 2 / n;
+
+            plane.normal.set(
+                Math.cos( angle ), 0, Math.sin( angle ) );
+
+            plane.constant = innerRadius;
+
+        }
+
+        return result;
+
+    }
+
+    var planeToMatrix = ( function () {
+        var xAxis = new THREE.Vector3(),
+            yAxis = new THREE.Vector3(),
+            trans = new THREE.Vector3();
+
+        return function planeToMatrix( plane ) {
+
+            var zAxis = plane.normal,
+                matrix = new THREE.Matrix4();
+            if ( Math.abs( zAxis.x ) > Math.abs( zAxis.z ) ) {
+
+                yAxis.set( - zAxis.y, zAxis.x, 0 );
+
+            } else {
+
+                yAxis.set( 0, - zAxis.z, zAxis.y );
+
+            }
+
+            xAxis.crossVectors( yAxis.normalize(), zAxis );
+
+            plane.coplanarPoint( trans );
+            return matrix.set(
+                xAxis.x, yAxis.x, zAxis.x, trans.x,
+                xAxis.y, yAxis.y, zAxis.y, trans.y,
+                xAxis.z, yAxis.z, zAxis.z, trans.z,
+                0,	 0, 0, 1 );
+
+        };
+
+    } )();
+
+    var Vertices = [
+            new THREE.Vector3( + 1, 0, + Math.SQRT1_2 ),
+            new THREE.Vector3( - 1, 0, + Math.SQRT1_2 ),
+            new THREE.Vector3( 0, + 1, - Math.SQRT1_2 ),
+            new THREE.Vector3( 0, - 1, - Math.SQRT1_2 )
+        ],
+
+        Indices = [
+            0, 1, 2,	0, 2, 3,	0, 3, 1,	1, 3, 2
+        ],
+
+        Planes = planesFromMesh( Vertices, Indices ),
+        PlaneMatrices = Planes.map( planeToMatrix ),
+
+        GlobalClippingPlanes = cylindricalPlanes( 5, 3.5 ),
+
+        Empty = Object.freeze( [] );
+
+
+    var camera, scene, renderer, startTime, stats,
+
+        object, clipMaterial,
+        volumeVisualization,
+        globalClippingPlanes;
+
+    function init() {
+
+        camera = new THREE.PerspectiveCamera(
+            36, window.innerWidth / window.innerHeight, 0.25, 16 );
+
+        camera.position.set( 0, 1.5, 3 );
+
+        scene = new THREE.Scene();
+        scene.add( new THREE.AmbientLight( 0x505050 ) );
+
+        var spotLight = new THREE.SpotLight( 0xffffff );
+        spotLight.angle = Math.PI / 5;
+        spotLight.penumbra = 0.2;
+        spotLight.position.set( 2, 3, 3 );
+        spotLight.castShadow = true;
+        spotLight.shadow.camera.near = 3;
+        spotLight.shadow.camera.far = 10;
+        spotLight.shadow.mapSize.width = 1024;
+        spotLight.shadow.mapSize.height = 1024;
+        scene.add( spotLight );
+
+        var dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
+        dirLight.position.set( 0, 2, 0 );
+        dirLight.castShadow = true;
+        dirLight.shadow.camera.near = 1;
+        dirLight.shadow.camera.far = 10;
+
+        dirLight.shadow.camera.right = 1;
+        dirLight.shadow.camera.left = - 1;
+        dirLight.shadow.camera.top	= 1;
+        dirLight.shadow.camera.bottom = - 1;
+
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        scene.add( dirLight );
+        clipMaterial = new THREE.MeshPhongMaterial( {
+            color: 0xee0a10,
+            shininess: 100,
+            side: THREE.DoubleSide,
+            // Clipping setup:
+            clippingPlanes: createPlanes( Planes.length ),
+            clipShadows: true
+        } );
+
+        object = new THREE.Group();
+
+        var geometry = new THREE.BoxBufferGeometry( 0.18, 0.18, 0.18 );
+
+        for ( var z = - 2; z <= 2; ++ z )
+            for ( var y = - 2; y <= 2; ++ y )
+                for ( var x = - 2; x <= 2; ++ x ) {
+                    var mesh = new THREE.Mesh( geometry, clipMaterial );
+                    mesh.position.set( x / 5, y / 5, z / 5 );
+                    mesh.castShadow = true;
+                    object.add( mesh );
+
+                }
+
+        scene.add( object );
+
+
+        var planeGeometry =
+                new THREE.PlaneBufferGeometry( 3, 3, 1, 1 ),
+
+            color = new THREE.Color();
+
+        volumeVisualization = new THREE.Group();
+        volumeVisualization.visible = false;
+
+        for ( var i = 0, n = Planes.length; i !== n; ++ i ) {
+
+            var material = new THREE.MeshBasicMaterial( {
+                color: color.setHSL( i / n, 0.5, 0.5 ).getHex(),
+                side: THREE.DoubleSide,
+
+                opacity: 0.2,
+                transparent: true,
+
+                clippingPlanes: clipMaterial.clippingPlanes.
+                filter( function ( _, j ) {
+
+                    return j !== i;
+
+                } )
+
+            } );
+
+            volumeVisualization.add(
+                new THREE.Mesh( planeGeometry, material ) );
+
+        }
+
+        scene.add( volumeVisualization );
+
+
+        var ground = new THREE.Mesh( planeGeometry,
+            new THREE.MeshPhongMaterial( {
+                color: 0xa0adaf, shininess: 150 } ) );
+        ground.rotation.x = - Math.PI / 2;
+        ground.scale.multiplyScalar( 3 );
+        ground.receiveShadow = true;
+        scene.add( ground );
+
+
+        var container = document.body;
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.shadowMap.enabled = true;
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        window.addEventListener( 'resize', onWindowResize, false );
+        container.appendChild( renderer.domElement );
+        globalClippingPlanes = createPlanes( GlobalClippingPlanes.length );
+        renderer.clippingPlanes = Empty;
+        renderer.localClippingEnabled = true;
+
+        stats = new Stats();
+        container.appendChild( stats.dom );
+
+        startTime = Date.now();
+
+    }
+
+    function onWindowResize() {
+
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+    }
+
+    function setObjectWorldMatrix( object, matrix ) {
+        var parent = object.parent;
+        scene.updateMatrixWorld();
+        object.matrix.getInverse( parent.matrixWorld );
+        object.applyMatrix( matrix );
+
+    }
+
+    var transform = new THREE.Matrix4(),
+        tmpMatrix = new THREE.Matrix4();
+
+    function animate() {
+
+        var currentTime = Date.now(),
+            time = ( currentTime - startTime ) / 1000;
+
+        requestAnimationFrame( animate );
+
+        object.position.y = 1;
+        object.rotation.x = time * 0.5;
+        object.rotation.y = time * 0.2;
+
+        object.updateMatrix();
+        transform.copy( object.matrix );
+
+        var bouncy = Math.cos( time * .5 ) * 0.5 + 0.7;
+        transform.multiply(
+            tmpMatrix.makeScale( bouncy, bouncy, bouncy ) );
+
+        assignTransformedPlanes(
+            clipMaterial.clippingPlanes, Planes, transform );
+
+        var planeMeshes = volumeVisualization.children;
+
+        for ( var i = 0, n = planeMeshes.length; i !== n; ++ i ) {
+
+            tmpMatrix.multiplyMatrices( transform, PlaneMatrices[ i ] );
+            setObjectWorldMatrix( planeMeshes[ i ], tmpMatrix );
+
+        }
+
+        transform.makeRotationY( time * 0.1 );
+
+        stats.begin();
+        renderer.render( scene, camera );
+        stats.end();
+
+    }
+
+    init();
+    animate();
+
+</script>
+</body>
+</html>

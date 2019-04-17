@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.yiban_application.system.dao.NiceDetailMapper" >
+    <resultMap id="BaseResultMap" type="com.yiban.yiban_application.javabean.NiceDetail" >
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="userid" property="userid"  />
+        <result column="contentid" property="contentid"  />
+        <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_nicedetail
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+    
+    <select id="findNiceDetail" resultMap="BaseResultMap" parameterType="com.yiban.yiban_application.javabean.NiceDetail">
+        select * from t_nicedetail where userid = #{userid,jdbcType=VARCHAR} AND contentid = #{contentid,jdbcType=INTEGER}
+    </select>
+    
+    <insert id="insertSelective" parameterType="com.yiban.yiban_application.javabean.NiceDetail" >
+        insert into t_nicedetail
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                id,
+            </if>
+            <if test="userid != null" >
+                userid,
+            </if>
+            <if test="contentid != null" >
+                contentid,
+            </if>
+            <if test="createtime != null" >
+                createtime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="id != null" >
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="userid != null" >
+                #{userid,jdbcType=VARCHAR},
+            </if>
+            <if test="contentid != null" >
+                #{contentid,jdbcType=INTEGER},
+            </if>
+            <if test="createtime != null" >
+                #{createtime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+</mapper>

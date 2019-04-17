@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<style>
+  #trends-table  thead{background: #5488c4;}
+  #trends-table tr:nth-child(even){
+    background:#f4f8fb;
+  }
+</style>
+<section class="content-header">
+  <h1>
+    动态管理
+    <small>Trends admin</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> 控制台</a></li>
+    <li class="active">动态管理</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Trends Info</h3>
+        </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button id="del-btn" onclick="delAll()" type="button" class="btn btn-danger btn-secondary">删除</button>
+          <button id="add-btn" type="button" class="btn btn-info btn-secondary" data-toggle="modal" data-target="#exampleModal">新增</button>
+        </div>
+        <div class="box-body">
+          <table id="trends-table" class="table table-hover"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!--确认删除弹出框-->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">动态新增</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="upload-form" enctype="multipart/form-data">
+          <div class="input-group">
+            <span class="input-group-addon">标题</span>
+            <input type="text" id="head" class="form-control" placeholder="标题" required>
+          </div>
+          <select id="trends-type" class="form-control" required>
+            <option value="0">请选择动态类别....</option>
+            <option value="6">通知</option>
+          </select>
+          <label for="username">
+          </label>
+          <input type="text" id="username" hidden th:value="${username.getId()}">
+          <div class="form-group">
+            <label for="editortable">正文</label>
+            <textarea class="form-control" id="editortable" name="editortable"  rows="3" required>
+            </textarea>
+          </div>
+          <input id="url" hidden/>
+          <div class="file-loading">
+            <input id="upload" name="upload" type="file" multiple="multiple"  >
+          </div>
+          <div id="errorBlock" class="help-block"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+        <button type="button" class="btn btn-primary" id="sub-info" name="sub-info">提交</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--
+
+-->
+<script src="../../../static/common.js" type="text/javascript"></script>
+<script>
+  $('#trends-table').bootstrapTable({
+    url: '/trends/ajaxTrends/table',
+    method: 'get',
+    striped: true,
+    cache: false,
+    toolbar: "#toolbar",
+    pagination: true,
+    sortable: false,
+    sidePagination: "server",
+    pageNumber: 1,
+    pageSize: 10,
+    pageList: [5, 10, 25, 50, 100],
+    minimumCountColumns: 2,
+    clickToSelect: true,
+    uniqueId: "id",
+    cardView: false,
+    detailView: false,
+    smartDisplay: false,
+    search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+    strictSearch: true,
+    showColumns: true,                  //是否显示所有的列
+    showRefresh: true,
+    queryParams : function (params) {
+      return {
+        pageSize: params.limit,
+        pageNum: params.offset / params.limit + 1   //页码
+      };
+    },
+    columns: [{
+      checkbox: true,
+      visible: true                  //是否显示复选框
+    },{
+      title: '动态ID',
+      field: 'trends_id',
+      align: 'center',
+      sortable: true
+    }, {
+      field: 'trends_info',
+      title: '动态内容',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'trends_outtime',
+      title: '动态发布时间',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'trends_status',
+      title: '动态状态',
+      sortable: true,
+      align: 'center',
+      formatter: function (value, row, index) {
+        var result = "";
+        if (value === 0) {
+          result += "<a href='javascript:;' class='btn btn-danger' onclick=UpdateById() >未授权</a>";
+          return result;
+        } else {
+          result += "<a href='javascript:;' class='btn btn-info' onclick=UpdateById() >已授权</a>";
+          return result;
+        }
+      }
+    }, {
+      field: 'trends_praise_number',
+      title: '动态点赞',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'trends_grand_user',
+      title: '动态授权',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'trends_head',
+      title: '动态标题',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'trends_img',
+      title: '动态图片',
+      sortable: true,
+      align: 'center',
+      formatter: function (value, row, index) {
+        var result = "";
+        var arr=value.split(",");
+        if (value!==""){
+          for (var i=0;i<arr.length ;i++ ) {
+            result += "<a href="+arr[i]+">图片"+i+"</a>";
+          }
+          return result;
+        }
+      }
+    }, {
+      field: 'trends_video',
+      title: '动态视频',
+      sortable: true,
+      align: 'center',
+      formatter: function (value, row, index) {
+        var result = "";
+        var arr=value.split(",");
+        if (value!==""){
+          for (var i=0;i<arr.length ;i++ ) {
+            result += "<a href="+arr[i]+">视频"+i+"</a>";
+          }
+          return result;
+        }
+      }
+    }, {
+      field: 'wall_user.yb_usernick',
+      title: '发布用户',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'trends_type.t_name',
+      title: '动态类别',
+      sortable: true,
+      align: 'center'
+    },{
+      field: 'price',
+      title: '操作',
+      width: 120,
+      align: 'center',
+      valign: 'middle',
+      formatter: actionFormatter
+    }
+    ]
+  });
+
+  /**
+   * 批量
+   * */
+
+  function delAll() {
+    var selected = $("#trends-table").bootstrapTable('getSelections');
+    var selected_length = selected.length;
+    if (!selected_length) {
+     _confirm_error('请勾选需要删除的动态！');
+      return;
+    }
+    var ids = "";
+    for (var i = 0; i < selected_length; i++) {
+      ids += selected[i].trends_id;
+      if (i !== (selected_length - 1)) ids += ",";
+    }
+    _confirm_common({
+      text: "确定删除选中的动态？",
+      confirmButtonText: "确定删除"
+    }, function() {
+      $.post('/trends/deleteAll/id', { "ids": ids }, function(r) {
+        if (r.result.status === 200) {
+          _confirm_success(r.result.message);
+          $('#trends-table').bootstrapTable('refresh');
+        } else {
+          _confirm_error(r.result.message);
+        }
+      });
+    });
+  }
+  //操作栏的格式化
+  function actionFormatter(value, row, index) {
+    var result = "";
+    result += "<a href='javascript:;' class='btn btn-xs red' onclick=DeleteByIds() title='删除'><span class='glyphicon glyphicon-remove'></span></a>";
+    return result;
+  }
+  /**
+   * 授权
+   * @constructor
+   */
+  function UpdateById() {
+    var a= $('#trends-table').bootstrapTable('getSelections');
+    if (a.length!==1) {
+      _confirm_error('请勾选需要授权动态');
+      return;
+    }
+    if (a.length>1) {
+      _confirm_error('不可批量授权');
+      return;
+    }
+    var id = a[0].trends_id;
+    var status = a[0].trends_status;
+    $.ajax({
+      url:"/trends/updateStatus/id?id="+id+"&status="+status+"&admin="+$('#username').val(),
+      success:function (date) {
+        if (date.result.status === 200){
+          _confirm_success(date.result.message);
+          $('#trends-table').bootstrapTable('refresh');
+          return;
+        }
+        _confirm_error(date.result.message);
+      }
+    });
+  }
+  /**
+   * 查看一条动态
+   * @constructor
+   */
+  function EditViewById() {
+    var a= $('#trends-table').bootstrapTable('getSelections');
+    if(a.length===1){
+      alert(a[0].assess_id);
+    }else{
+      alert("请选中一行")
+    }
+  }
+
+  /**
+   * 删除一条动态
+   * @constructor
+   */
+  function DeleteByIds() {
+    var id;
+    var a= $('#trends-table').bootstrapTable('getSelections');
+    if(a.length!==1){
+     _confirm_error("请选中一行");
+      return;
+    }
+    id = a[0].trends_id;
+    $.ajax({
+      url:"/trends/deleteTrends/"+id,
+      success:function (date) {
+        if (date.result.status === 200){
+          _confirm_success(date.result.message);
+          $('#trends-table').bootstrapTable('refresh');
+          return;
+        }
+        _confirm_error(date.result.message);
+      }
+    })
+  }
+
+
+
+  /**
+   * 操作表单
+   */
+  $(function () {
+    var imgurl = "";
+    $("#upload").fileinput({
+      language: 'zh',
+      uploadAsync: true,
+      showPreview : true,
+      showCaption:true,
+      uploadUrl:'/file/image?username='+$('#username').val()+'',
+      browseLabel: '上传资源',
+      previewFileIcon: '<i class="fa fa-3x fa-file"></i>',
+      showUpload: true, //是否显示上传按钮
+      showRemove : true, //显示移除按钮
+      browseClass: "btn btn-primary", //按钮样式
+      dropZoneEnabled: false,//是否显示拖拽区域
+      maxFileCount: 5, //表示允许同时上传的最大文件个数
+      enctype: 'multipart/form-data',
+      validateInitialCount:true,
+      msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+      previewFileIconSettings: {
+        'jpg': '<i class="fas fa-file-image text-warning"></i>',
+        'mov': '<i class="fas fa-file-video text-warning"></i>',
+        'mp3': '<i class="fas fa-file-audio text-warning"></i>',
+      },
+      previewFileExtSettings: {
+        'jpg': function(ext) {
+          return ext.match(/(jp?g|png|gif|bmp)$/i);
+        },
+        'mov': function(ext) {
+          return ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i);
+        },
+        'mp3': function(ext) {
+          return ext.match(/(mp3|wav)$/i);
+        }
+      }
+    });
+    $("#upload").on("fileuploaded", function (event, data, previewId, index) {
+      var  response =  data.response;
+      imgurl+=response.filePath+',';
+      $("#url").val(imgurl);
+    });
+//上传前
+    $('#upload').on('filebatchuploadsuccess', function(event, data, previewId, index) {
+      var form = data.form, files = data.files, extra = data.extra,
+              response = data.response, reader = data.reader;
+    });
+  });
+  $(function () {
+    var url = "/upload/CkeditorData";
+    $('#sub-info').click(function () {
+      var head = $('#head').val();
+      var options=$("#trends-type option:selected");
+      var res = $('#url').val();
+      console.log(res);
+      if (head===""||options.val()==0){
+        _confirm_error("信息不全！无法提交");
+        return;
+      }
+      var content = $('#editortable').val();
+      if(content!==null&&content!==undefined){
+        $.ajax({
+          url:url,
+          type:"post",
+          cache:false,
+          data:{"data":content,"head":head,"username":$('#username').val(),"options":options.val(),"res":res!==''?res:''},
+          beforeSend :function(xmlHttp){
+            xmlHttp.setRequestHeader("If-Modified-Since","0");
+            xmlHttp.setRequestHeader("Cache-Control","no-cache");
+          },
+          success:function (data) {
+            if (data.result.message===""){
+              _confirm_error(data.result.error);
+            }
+            else {
+              _confirm_success(data.result.message);
+            }
+            $('#exampleModal').modal('hide');
+            $('#trends-table').bootstrapTable('refresh');
+          }
+        })
+      }
+    })
+  });
+</script>
+
+</html>

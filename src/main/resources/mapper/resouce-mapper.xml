@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.yiban_application.system.dao.ResourceInterface">
+
+    <resultMap id="BaseResultMapImage" type="com.yiban.yiban_application.javabean.Wall_image">
+        <id property="image_id" column="image_id"/>
+        <result property="image_size" column="image_size"/>
+        <result property="image_user" column="image_user"/>
+        <result property="image_path" column="image_path"/>
+        <result property="image_url" column="image_url"/>
+        <result property="image_type" column="image_type"/>
+        <result property="image_status" column="image_status"/>
+        <result property="image_format" column="image_format"/>
+        <result property="image_name" column="image_name"/>
+    </resultMap>
+    <resultMap id="BaseResultMapVideo" type="com.yiban.yiban_application.javabean.Wall_video">
+        <id property="video_id" column="video_id"/>
+        <result property="video_size" column="video_size"/>
+        <result property="video_format" column="video_format"/>
+        <result property="video_user" column="video_user"/>
+        <result property="video_time" column="video_time"/>
+        <result property="video_path" column="video_path"/>
+        <result property="video_url" column="video_url"/>
+        <result property="video_status" column="video_status"/>
+        <result property="video_name" column="video_name"/>
+    </resultMap>
+    <insert id="insertWall_image" parameterType="com.yiban.yiban_application.javabean.Wall_image">
+
+         insert into t_wall_image(image_id, image_size, image_user, image_path, image_url, image_type, image_status,image_format,image_name)
+
+          values (#{image_id},#{image_size},#{image_user},#{image_path},#{image_url},#{image_type},#{image_status},#{image_format},#{image_name})
+
+    </insert>
+    
+    <insert id="insertWall_video" parameterType="com.yiban.yiban_application.javabean.Wall_video">
+
+         insert into t_wall_video(video_id, video_size, video_format, video_user, video_status, video_path, video_url,video_name)
+
+          values (#{video_id},#{video_size},#{video_format},#{video_user},#{video_status},#{video_path},#{video_url},#{video_name})
+
+    </insert>
+    
+    
+    <select id="imageAllByList" resultMap="BaseResultMapImage" parameterType="java.util.List">
+        select * from t_wall_image where image_id in
+        <foreach item="item" index="index" collection="list" open="("
+                 separator="," close=")">#{item}</foreach>
+    </select>
+    
+    <select id="videoAllByList" resultMap="BaseResultMapVideo">
+        
+        select video_id, video_size, video_format, video_user, video_time, video_status, video_path, video_url,video_name from t_wall_video order by video_id desc
+    
+    </select>
+    
+    <select id="imageAll" resultMap="BaseResultMapImage">
+        
+        select image_id, image_size, image_user, image_path, image_url, image_type, image_status, image_format ,image_name from t_wall_image order by image_id desc
+        
+    </select>
+    
+    <delete id="deleteImageById">
+    
+        delete from t_wall_image where image_id=#{image_id} and image_name=#{image_name}
+
+    </delete>
+    
+    <delete id="deleteVideoById">
+        delete from t_wall_video where video_id=#{video_id} and video_name=#{video_name}
+    </delete>
+    
+
+</mapper>

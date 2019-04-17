@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.yiban_application.system.dao.RendsInterface">
+    <resultMap id="BaseResultTrends" type="com.yiban.yiban_application.javabean.Wall_trends">
+        <id column="trends_id" property="trends_id"/>
+        <result column="trends_info" property="trends_info"/>
+        <result column="trends_img" property="trends_img"/>
+        <result column="trends_video" property="trends_video"/>
+        <result column="trends_outtime" property="trends_outtime"/>
+        <result column="trends_status" property="trends_status"/>
+        <result column="trends_praise_number" property="trends_praise_number"/>
+        <result column="trends_grand_user" property="trends_grand_user"/>
+        <result column="trends_head" property="trends_head"/>
+        <association property="wall_user" column="trends_user">
+            <id column="id" property="id"/>
+            <result column="yb_usernick" property="yb_usernick"/>
+            <result column="yb_schoolname" property="yb_schoolname"/>
+            <result column="yb_money" property="yb_money"/>
+            <result column="yb_userhead" property="yb_userhead"/>
+            <result column="yb_regtime" property="yb_regtime"/>
+            <result column="yb_usertrends" property="yb_usertrends"/>
+            <result column="yb_userassess" property="yb_userassess"/>
+        </association>
+        <association property="trends_type" column="trends_type">
+            <id property="t_id" column="t_id"/>
+            <result property="t_name" column="t_name"/>
+        </association>
+    </resultMap>
+    
+    <select id="trendsConutByUser" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(*) from t_wall_trends where trends_user=#{user_id}
+    </select>
+
+    <select id="rendsConut" resultType="java.lang.Integer">
+
+        select count(*) from t_wall_trends
+
+    </select>
+
+    <select id="noConut" resultType="java.lang.Integer">
+
+        select count(*) from t_wall_trends where trends_status=0
+
+    </select>
+
+    <select id="yesConut" resultType="java.lang.Integer">
+
+        select count(*) from t_wall_trends where trends_status=1
+
+    </select>
+    
+    <select id="getTrendsByMax" resultMap="BaseResultTrends">
+        select  t.trends_id trends_id,t.trends_info trends_info,t.trends_img trends_img,
+                t.trends_video trends_video,t.trends_outtime trends_outtime,
+                t.trends_status trends_status,t.trends_praise_number trends_praise_number,
+                t.trends_user trends_user,t.trends_grand_user trends_grand_user,t.trends_type trends_type,t.trends_head trends_head,
+                u.id id,u.yb_usernick yb_usernick,
+                p.t_id t_id,p.t_name t_name
+        from
+            t_wall_trends t,t_wall_user u,t_trends_type p
+        where  u.id=t.trends_user AND p.t_id=t.trends_type and
+            t.trends_praise_number = (select max(t.trends_praise_number) from t_wall_trends)
+    </select>
+
+    <select id="getAll" resultMap="BaseResultTrends">
+
+       select  t.trends_id trends_id,t.trends_info trends_info,t.trends_img trends_img,
+
+         t.trends_video trends_video,t.trends_outtime trends_outtime,
+
+         t.trends_status trends_status,t.trends_praise_number trends_praise_number,
+
+         t.trends_user trends_user,t.trends_grand_user trends_grand_user,t.trends_type trends_type,t.trends_head trends_head,
+
+         u.id id,u.yb_usernick yb_usernick,
+
+          p.t_id t_id,p.t_name t_name
+         from
+       t_wall_trends t,t_wall_user u,t_trends_type p
+       where  u.id=t.trends_user AND p.t_id=t.trends_type
+       order by trends_id desc
+    </select>
+    <select id="getAllByUser" resultMap="BaseResultTrends">
+
+        select  t.trends_id trends_id,t.trends_info trends_info,t.trends_img trends_img,
+
+         t.trends_video trends_video,t.trends_outtime trends_outtime,
+
+         t.trends_status trends_status,t.trends_praise_number trends_praise_number,
+
+         t.trends_user trends_user,t.trends_grand_user trends_grand_user,t.trends_type trends_type,t.trends_head trends_head,
+
+         u.id id,u.yb_usernick yb_usernick,
+
+          p.t_id t_id,p.t_name t_name
+         from
+
+       t_wall_trends t,t_wall_user u,t_trends_type p
+
+       where u.id=t.trends_user AND p.t_id=t.trends_type
+       AND trends_user = #{user_id}
+       order by trends_praise_number desc
+    </select>
+
+    <select id="getAllByType" resultMap="BaseResultTrends" parameterType="java.lang.Integer">
+
+          select  t.trends_id trends_id,t.trends_info trends_info,t.trends_img trends_img,
+
+         t.trends_video trends_video,t.trends_outtime trends_outtime,
+
+         t.trends_status trends_status,t.trends_praise_number trends_praise_number,
+
+         t.trends_user trends_user,t.trends_grand_user trends_grand_user,t.trends_type trends_type,t.trends_head trends_head,
+
+         u.id id,u.yb_usernick yb_usernick,
+
+          p.t_id t_id,p.t_name t_name
+         from
+       t_wall_trends t,t_wall_user u,t_trends_type p
+       where u.id=t.trends_user AND p.t_id=t.trends_type
+       and trends_type=#{type} and trends_status=1 order by trends_id desc
+
+    </select>
+
+    <insert id="insertRends" parameterType="com.yiban.yiban_application.javabean.Wall_trends">
+
+        insert into t_wall_trends(trends_id, trends_info, trends_img, trends_video, trends_outtime, trends_status, trends_user, trends_type, trends_head)
+
+         values (#{trends_id},#{trends_info},#{trends_img},#{trends_video},#{trends_outtime},#{trends_status},#{wall_user.id},#{trends_type.t_id},#{trends_head})
+
+    </insert>
+
+    <select id="getAllById" resultMap="BaseResultTrends">
+        select t.trends_id trends_id,t.trends_info trends_info,t.trends_img trends_img,
+
+         t.trends_video trends_video,t.trends_outtime trends_outtime,
+
+         t.trends_status trends_status,t.trends_praise_number trends_praise_number,
+
+         t.trends_user trends_user,t.trends_grand_user trends_grand_user,t.trends_type trends_type,t.trends_head trends_head,
+
+         u.id id,u.yb_usernick yb_usernick,
+
+          p.t_id t_id,p.t_name t_name
+         from
+       t_wall_trends t,t_wall_user u,t_trends_type p
+       where u.id=t.trends_user AND p.t_id=t.trends_type
+       and trends_id=#{trends_id}
+       
+    </select>
+    
+    <update id="updateRendsById" parameterType="com.yiban.yiban_application.javabean.Wall_trends">
+        
+       UPDATE t_wall_trends SET trends_praise_number = #{trends_praise_number} WHERE trends_id = #{trends_id}
+       
+    </update>
+    <delete id="deleteRendsById">
+      delete from t_wall_trends where trends_id=#{id}
+    </delete>
+    
+    <update id="updateSataus">
+      
+        update t_wall_trends set trends_status = #{new_trends_status},trends_grand_user=#{admin}  where trends_id=#{id}
+
+    </update>
+</mapper>

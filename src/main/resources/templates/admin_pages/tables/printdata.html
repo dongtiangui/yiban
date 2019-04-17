@@ -1,0 +1,234 @@
+
+<style>
+  #table  thead{background: #5488c4;}
+  #table tr:nth-child(even){
+    background:#f4f8fb;
+  }
+</style>
+
+<section class="content-header">
+  <h1>
+    订单打印管理
+    <small>Print admin</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> 控制台</a></li>
+    <li class="active">订单打印管理</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Print Info</h3>
+        </div>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" onclick="" class="btn btn-secondary">订单处理</button>
+            <button type="button" onclick="deleAll()" class="btn btn-secondary">订单删除</button>
+          </div>
+        <div class="box-body">
+          <table id="table" class="table table-hover"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="../../../static/common.js" type="text/javascript"></script>
+<script>
+  $('#table').bootstrapTable({
+    url: '/print/ajaxPrint',
+    method: 'get',
+    striped: true,
+    cache: false,
+    toolbar: "#toolbar",
+    pagination: true,
+    sortable: false,
+    sidePagination: "server",
+    pageNumber: 1,
+    pageSize: 10,
+    pageList: [5, 10, 25, 50, 100],
+    minimumCountColumns: 2,
+    clickToSelect: true,
+    uniqueId: "print_id",
+    cardView: false,
+    detailView: false,
+    smartDisplay: false,
+    search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+    strictSearch: true,
+    showColumns: true,                  //是否显示所有的列
+    showRefresh: true,
+    queryParams : function (params) {
+      return {
+        pageSize: params.limit,
+        pageNum: params.offset / params.limit + 1,   //页码
+      };
+    },
+    columns: [{
+      checkbox: true,
+      visible: true                  //是否显示复选框
+    },{
+      title: '主键ID',
+      field: 'print_id',
+      align: 'center',
+      sortable: true
+    }, {
+      field: 'print_name',
+      title: '下单用户',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'print_url',
+      title: '订单url',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'print_number',
+      title: '打印数量',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'print_local',
+      title: '客户寝室',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'print_file',
+      title: '打印文件',
+      sortable: true,
+      align: 'center',
+      formatter: function (value, row, index) {
+        var result = "";
+        var arr=value.split(",");
+        if (value!==""){
+          for (var i=0;i<arr.length ;i++ ) {
+            if (arr[i]===''){
+              continue;
+            }
+            result += "<a href=/downloadFile/"+arr[i]+">文件"+i+"<br></a>";
+          }
+          return result;
+        }
+      }
+    }, {
+      field: 'print_fomat',
+      title: '打印格式',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'print_color',
+      title: '打印颜色',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'print_time',
+      title: '下单时间',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'print_status',
+      title: '订单状态',
+      sortable: true,
+      align: 'center',
+      formatter: function (value, row, index) {
+        var result = "";
+        if (value === '0') {
+          result += "<a href='javascript:;' class='btn btn-danger' onclick=UpdateById() >未处理</a>";
+          return result;
+        } else {
+          result += "<a href='javascript:;' class='btn btn-info' onclick=UpdateById() >已处理</a>";
+          return result;
+        }
+      }
+    }, {
+      field: 'printLocal.t_local_name',
+      title: '打印室',
+      sortable: true,
+      align: 'center'
+    },{
+      field: 'price',
+      title: '操作',
+      width: 120,
+      align: 'center',
+      valign: 'middle',
+      formatter: actionFormatter
+    }
+    ]
+  });
+  //操作栏的格式化
+  function actionFormatter(value, row, index) {
+    var result = "";
+    result += "<a href='javascript:;' class='btn btn-xs red' onclick=DeleteByIds() title='删除'><span class='glyphicon glyphicon-remove'></span></a>";
+    return result;
+  }
+
+  function UpdateById() {
+    var a= $('#table').bootstrapTable('getSelections');
+    if(a.length!==1){
+      _confirm_error("请选中一行");
+      return;
+    }
+    var status = a[0].print_status;
+    var id = a[0].print_id;
+    $.ajax({
+      url:"/print/updateById/?id="+id+"&status="+status,
+      success:function (date) {
+        if (date.status === 200){
+          _confirm_success(date.message);
+          $('#table').bootstrapTable('refresh');
+          return;
+        }
+        _confirm_error(date.message);
+      }
+    })
+  }
+
+  function deleAll() {
+    var selected = $("#table").bootstrapTable('getSelections');
+    var selected_length = selected.length;
+    if (!selected_length) {
+      _confirm_error('请勾选需要删除的动态！');
+      return;
+    }
+    var ids = "";
+    for (var i = 0; i < selected_length; i++) {
+      ids += selected[i].print_id;
+      if (i !== (selected_length - 1)) ids += ",";
+    }
+    _confirm_common({
+      text: "确定删除选中的动态？",
+      confirmButtonText: "确定删除"
+    }, function() {
+      $.post('/print/deleteAll/id', { "ids": ids }, function(r) {
+        if (r.status === 200) {
+          _confirm_success(r.message);
+          $('#table').bootstrapTable('refresh');
+        } else {
+          _confirm_error(r.message);
+        }
+      });
+    });
+  }
+
+  function DeleteByIds() {
+    var id;
+    var a= $('#table').bootstrapTable('getSelections');
+    if(a.length!==1){
+      _confirm_error("请选中一行");
+      return;
+    }
+    id = a[0].print_id;
+    $.ajax({
+      url:"/print/deleteById/"+id,
+      success:function (date) {
+        if (date.status === 200){
+          _confirm_success(date.message);
+          $('#table').bootstrapTable('refresh');
+          return;
+        }
+        _confirm_error(date.message);
+      }
+    })
+  }
+</script>

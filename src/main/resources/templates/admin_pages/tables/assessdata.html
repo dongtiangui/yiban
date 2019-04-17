@@ -1,0 +1,161 @@
+
+<style>
+  #table  thead{background: #5488c4;}
+  #table tr:nth-child(even){
+    background:#f4f8fb;
+  }
+</style>
+
+<section class="content-header">
+    <h1>
+        评论管理
+        <small>user admin</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> 控制台</a></li>
+        <li class="active">评论管理</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">Assess Info</h3>
+                </div>
+                <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" class="btn btn-secondary" onclick="deleAssessAll()">删除</button>
+                </div>
+                <div class="box-body">
+                    <table id="table-assess" class="table table-hover"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="../../../static/common.js" type="text/javascript"></script>
+
+<script>
+  $('#table-assess').bootstrapTable({
+      url: '/assess/ajaxassessdata',
+      method: 'get',
+      striped: true,
+      cache: false,
+      toolbar: "#toolbar",
+      pagination: true,
+      sortable: false,
+      sidePagination: "server",
+      pageNumber: 1,
+      pageSize: 10,
+      pageList: [5, 10, 25, 50, 100],
+      minimumCountColumns: 2,
+      clickToSelect: true,
+      uniqueId: "assess_id",
+      cardView: false,
+      detailView: false,
+      smartDisplay: false,
+      search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+      strictSearch: true,
+      showColumns: true,                  //是否显示所有的列
+      showRefresh: true,
+      queryParams : function (params) {
+      return {
+          pageSize: params.limit,
+          pageNum: params.offset / params.limit + 1,   //页码
+      };
+    },
+    columns: [{
+      checkbox: true,
+      visible: true                  //是否显示复选框
+      },{
+      title: '主键ID',
+      field: 'assess_id',
+      align: 'center',
+      sortable: true,
+    }, {
+      field: 'assess_info',
+      title: '评论信息',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'assess_user',
+      title: '评论用户',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'assess_status',
+      title: '评论状态',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'wall_trends.trends_info',
+      title: '动态信息',
+      sortable: true,
+      align: 'center'
+    },{
+      field: 'price',
+      title: '操作',
+      width: 120,
+      align: 'center',
+      valign: 'middle',
+      formatter: actionFormatter
+    }
+    ]
+  });
+  //操作栏的格式化
+  function actionFormatter(value, row, index) {
+    var id = value;
+    var result = "";
+    result += "<a href='javascript:;' class='btn btn-xs red' onclick=DeleteByIds() title='删除'><span class='glyphicon glyphicon-remove'></span></a>";
+    return result;
+  }
+
+  function DeleteByIds() {
+      var id;
+      var a= $('#table-assess').bootstrapTable('getSelections');
+      if(a.length!==1){
+          _confirm_error("请选中一行");
+          return;
+      }
+      id = a[0].assess_id;
+      $.ajax({
+          url:"/assess/deleteassessById/"+id,
+          success:function (date) {
+              if (date.status === 200){
+                  _confirm_success(date.message);
+                  $('#table-assess').bootstrapTable('refresh');
+                  return;
+              }
+              _confirm_error(date.message);
+          }
+      });
+  }
+
+  function deleAssessAll() {
+      var selected = $("#table-assess").bootstrapTable('getSelections');
+      var selected_length = selected.length;
+      if (!selected_length) {
+          _confirm_error('请勾选需要删除的评论！');
+          return;
+      }
+      var ids = "";
+      for (var i = 0; i < selected_length; i++) {
+          ids += selected[i].assess_id;
+          if (i !== (selected_length - 1)) ids += ",";
+      }
+      _confirm_common({
+          text: "确定删除选中的评论？",
+          confirmButtonText: "确定删除"
+      }, function() {
+          $.post('/assess/deleteAll/id', { "ids": ids }, function(r) {
+              if (r.status === 200) {
+                  _confirm_success(r.message);
+                  $('#table-assess').bootstrapTable('refresh');
+              } else {
+                  _confirm_error(r.message);
+              }
+          });
+      });
+  }
+</script>

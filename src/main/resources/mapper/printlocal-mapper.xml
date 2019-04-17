@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.yiban_application.system.dao.PrintLocalInterface">
+
+    <resultMap id="BaseResultMap" type="com.yiban.yiban_application.javabean.PrintLocal">
+        <id property="t_local_id" column="t_local_id"/>
+        <result property="t_local_name" column="t_local_name"/>
+        <result property="t_local_person" column="t_local_person"/>
+        <result property="t_local_number" column="t_local_number"/>
+        <result property="t_local_host" column="t_local_host"/>
+    </resultMap>
+    
+    <select id="getAll" resultMap="BaseResultMap">
+        
+        select t_local_id, t_local_name, t_local_person, t_local_number, t_local_host from t_local
+
+        order by t_local_id desc
+      
+    </select>
+    
+    <insert id="insert" parameterType="com.yiban.yiban_application.javabean.PrintLocal">
+        insert into t_local(t_local_name, t_local_person, t_local_number, t_local_host)
+         VALUES (#{t_local_name},#{t_local_person},#{t_local_number},#{t_local_host})
+    
+    </insert>
+    
+    <delete id="delById" parameterType="java.lang.Integer">
+        delete from t_local where t_local_id=#{id}
+    </delete>
+    
+    
+
+</mapper>

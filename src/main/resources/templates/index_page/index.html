@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="cleartype" content="on">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="MobileOptimized" content="320">
+	<meta name="HandheldFriendly" content="True">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<link rel="stylesheet" href="../../static/index/css/swiper-3.2.7.min.css" />
+	<link rel="stylesheet" type="text/css" href="../../static/index/framework/bootstrap/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="../../static/bower_components/font-awesome/css/font-awesome.css">
+	<link rel="stylesheet" type="text/css" href="../../static/index/css/sidenav.min.css" />
+	<title>师生共建墙</title>
+	<style type="text/css">
+		body {
+			margin: 0 auto;
+			color: #333;
+			padding: 0;
+			font-family: "Microsoft Yahei",serif;
+			text-align: center;
+		}
+		.container {
+			width: 100%;
+			border: 1px solid #ccc;
+		}
+		.swiper1 {
+			width: 100%;
+			background-color: lightseagreen;
+			color: white;
+		}
+		.swiper1 .selected {
+			color: #ec5566;
+			border-bottom: 2px solid #ec5566;
+		}
+		.swiper1 .swiper-slide {
+			text-align: center;
+			font-size: 16px;
+			height: 50px;
+			/* Center slide text vertically */
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: -webkit-flex;
+			display: flex;
+			-webkit-box-pack: center;
+			-ms-flex-pack: center;
+			-webkit-justify-content: center;
+			justify-content: center;
+			-webkit-box-align: center;
+			-ms-flex-align: center;
+			-webkit-align-items: center;
+			align-items: center;
+			cursor: pointer;
+		}
+
+		.swiper2 {
+			width: 100%;
+		}
+		.swiper2 .swiper-slide {
+			height: calc(100vh - 50px);
+			background-color: lightblue;
+			color: #fff;
+			text-align: center;
+			/*
+				!important 表示优先样式权限
+			*/
+			box-sizing: border-box !important;
+			overflow-x: hidden !important;
+		}
+		ul { list-style: none outside none; margin:0; padding: 0; }
+		body .mainmenu:after { clear: both; content: " "; display: block; }
+
+		body .mainmenu li{
+			float:left;
+			margin-left: 2.5%;
+			margin-top: 2.5%;
+			width: 30%;
+			border-radius:3px;
+			overflow:hidden;
+		}
+		body .mainmenu li a{ display:block;  color:#FFF;   text-align:center }
+		body .mainmenu li a b{
+			display:block; height:80px;
+		}
+		body .mainmenu li a img{
+			margin: 15px auto 15px;
+			width: 50px;
+			height: 50px;
+		}
+		body .mainmenu li a span{ display:block; height:30px; line-height:30px;background-color:#FFF; color: #999; font-size:14px; }
+		body .mainmenu li:nth-child(8n+1) {background-color:#36A1DB}
+		body .mainmenu li:nth-child(8n+2) {background-color:#678ce1}
+		body .mainmenu li:nth-child(8n+3) {background-color:#8c67df}
+		body .mainmenu li:nth-child(8n+4) {background-color:#84d018}
+		body .mainmenu li:nth-child(8n+5) {background-color:#14c760}
+		body .mainmenu li:nth-child(8n+6) {background-color:#f3b613}
+		body .mainmenu li:nth-child(8n+7) {background-color:#ff8a4a}
+		body .mainmenu li:nth-child(8n+8) {background-color:#fc5366}
+	</style>
+</head>
+<body>
+<div class="container">
+	<div class="swiper-container swiper1">
+		<div class="swiper-wrapper">
+			<div class="swiper-slide selected">
+				首页<i class="fa fa-1x fa-home"></i>
+			</div>
+			<div class="swiper-slide">
+				交易<i class="fa fa-1x fa-shopping-bag"></i>
+			</div>
+			<div class="swiper-slide">
+				告白<i class="fa fa-1x fa-heart"></i>
+			</div>
+			<div class="swiper-slide">
+				寻人<i class="fa fa-1x fa-user"></i>
+			</div>
+			<div class="swiper-slide">
+				寻物<i class="fa fa-1x fa-shopping-basket"></i>
+			</div>
+			<div class="swiper-slide">
+				学习<i class="fa fa-1x fa-book"></i>
+			</div>
+			<div class="swiper-slide">
+				通知<i class="fa fa-1x fa-info"></i>
+			</div>
+			<div class="swiper-slide">
+				其它<i class="fa fa-1x fa-plus"></i>
+			</div>
+		</div>
+	</div>
+	<div class="swiper-container swiper2">
+		<div class="swiper-wrapper">
+			<div class="mescroll swiper-slide swiper-no-swiping" id="mescroll">
+				<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+					<ol class="carousel-indicators">
+						<li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+						<li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+					</ol>
+					<div class="carousel-inner" >
+						<div class="carousel-item active">
+							<img class="d-flex w-100 img-fluid"  src="../../static/index/images/11690381.jpg" alt="First slide">
+							<div class="carousel-caption d-none d-md-block">
+								<h5>...</h5>
+								<p>...</p>
+							</div>
+						</div>
+						<div class="carousel-item">
+							<img class="d-flex w-100 img-fluid" src="../../static/index/images/11690381.jpg" alt="Second slide">
+							<div class="carousel-caption d-none d-md-block">
+								<h5>...</h5>
+								<p>...</p>
+							</div>
+						</div>
+					</div>
+					<a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+						<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+						<span class="sr-only"></span>
+					</a>
+					<a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+						<span class="carousel-control-next-icon" aria-hidden="true"></span>
+						<span class="sr-only"></span>
+					</a>
+				</div>
+				<div class="box-content">
+					<!-- 首页list -->
+					<ul class="list-group" id="list-ho">
+						<ul class="mainmenu">
+							<li><a th:href="@{/adout.html}" ><b><img src="../../static/index/images/icon/guanyuwomen.png" /></b><span>关于我们</span></a></li>
+							<li><a th:if="${user_info!=null}" th:href="@{/index/user.html/(id=${user_info.getId()},session=${user_info.getSession()})}" ><b>
+								<img src="../../static/index/images/icon/zhuye.png" /></b><span>我的主页</span></a></li>
+							<li><a th:href="@{/recommend.html}" ><b><img src="../../static/index/images/icon/tuijian.png" /></b><span>我的推荐</span></a></li>
+							<li><a th:href="@{/video.html/(id=${user_info.getId()},session=${user_info.getSession()})}" ><b><img src="../../static/index/images/icon/faxiaoshipin.png" /></b><span>小视频</span></a></li>
+							<li><a th:href="@{/image.html/(id=${user_info.getId()},session=${user_info.getSession()})}" ><b><img src="../../static/index/images/icon/tupian.png" /></b><span>精美图片</span></a></li>
+							<li><a th:href="@{/print.html/(id=${user_info.getId()},session=${user_info.getSession()})}" ><b><img src="../../static/index/images/icon/ershou.png" /></b><span>校园打印</span></a></li>
+						</ul>
+					</ul>
+				</div>
+			</div>
+			<!--交易-->
+			<div class="swiper-slide swiper-no-swiping mescroll-tr" id="mescroll-tr">
+				<div class="box-content">
+					<!-- 首页list -->
+					<ul class="list-group" id="list-tr">
+
+					</ul>
+				</div>
+			</div>
+
+			<!--告白-->
+			<div class="swiper-slide swiper-no-swiping">
+				<div class="list-group" id="list-ex">
+
+				</div>
+			</div>
+			<!--寻人-->
+			<div class="swiper-slide swiper-no-swiping">
+				<div class="list-group" id="list-pe">
+
+				</div>
+			</div>
+			<!--寻物-->
+			<div class="swiper-slide swiper-no-swiping">
+				<div class="list-group" id="list-fo">
+
+				</div>
+			</div>
+			<!--学习-->
+			<div class="swiper-slide swiper-no-swiping">
+				<div class="list-group" id="list-st">
+
+				</div>
+			</div>
+			<!--通知-->
+			<div class="swiper-slide swiper-no-swiping">
+				<div class="list-group" id="list-ad">
+
+				</div>
+			</div>
+			<!--其它-->
+			<div class="swiper-slide swiper-no-swiping">
+				<div class="list-group" id="list-ot">
+
+				</div>
+				<!--end-->
+			</div>
+		</div>
+	</div>
+</div>
+<script src="../../static/index/framework/jquery/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../static/index/framework/swiper-3.4.0.jquery.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../static/index/framework/bootstrap/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../static/index/framework/polygonizr.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../static/index/js/sidenav.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../static/index/js/index.js" type="text/javascript" charset="utf-8"></script>
+
+</body>
+</html>

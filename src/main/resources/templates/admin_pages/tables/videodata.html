@@ -1,0 +1,205 @@
+<style>
+  #table-video  thead{background: #c44a57;}
+  #table-video tr:nth-child(even){
+    background:#f4f8fb;
+  }
+</style>
+<section class="content-header">
+  <h1>
+    视频管理
+    <small>Image admin</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> 控制台</a></li>
+    <li class="active">视频管理</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">Video Info</h3>
+        </div>
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <button type="button" class="btn btn-secondary" onclick="deleVideoAll()">删除</button>
+        </div>
+        <div class="box-body">
+          <table id="table-video" class="table table-hover"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="../../../static/common.js" type="text/javascript"></script>
+
+<script>
+  $('#table-video').bootstrapTable({
+    url: '/resource/ajaxvideodata',
+    method: 'get',
+    striped: true,
+    cache: false,
+    toolbar: "#toolbar",
+    pagination: true,
+    sortable: false,
+    sidePagination: "server",
+    pageNumber: 1,
+    pageSize: 10,
+    pageList: [5, 10, 25, 50, 100],
+    minimumCountColumns: 2,
+    clickToSelect: true,
+    uniqueId: "image_id",
+    cardView: false,
+    detailView: false,
+    smartDisplay: false,
+    search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+    strictSearch: true,
+    showColumns: true,                  //是否显示所有的列
+    showRefresh: true,
+    queryParams : function (params) {
+      return {
+        pageSize: params.limit,
+        pageNum: params.offset / params.limit + 1   //页码
+      }
+    },
+    columns: [{
+      checkbox: true,
+      visible: true                  //是否显示复选框
+    },{
+      title: '主键ID',
+      field: 'video_id',
+      align: 'center',
+      sortable: true,
+    }, {
+      field: 'video_size',
+      title: '视频大小',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'video_format',
+      title: '视频格式',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'video_user',
+      title: '上传用户',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'video_time',
+      title: '上传时间',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'video_status',
+      title: '视频状态',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'video_path',
+      title: '视频路径',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'video_url',
+      title: '视频地址',
+      sortable: true,
+      align: 'center',
+      formatter: function (value, row, index) {
+        return "<a href='javascript:;' class='btn btn-danger' onclick=showVideo()>图片查看</a>"
+      }
+    }, {
+      field: 'video_name',
+      title: '视频名称',
+      sortable: true,
+      align: 'center'
+    },{
+      field: 'price',
+      title: '操作',
+      width: 120,
+      align: 'center',
+      valign: 'middle',
+      formatter: actionFormatter
+    }
+    ]
+  });
+  //操作栏的格式化
+  function actionFormatter(value, row, index) {
+    var id = value;
+    var result = "";
+    result += "<a href='javascript:;' class='btn btn-xs red' onclick=DeleteByIds() title='删除'><span class='glyphicon glyphicon-remove'></span></a>";
+    return result;
+  }
+
+  function DeleteByIds() {
+    var id;
+    var a= $('#table-video').bootstrapTable('getSelections');
+    if(a.length!==1){
+      _confirm_error("请选中一行");
+      return;
+    }
+    id = a[0].video_id;
+    var name = a[0].video_name;
+    $.ajax({
+      url:"/resource/deleteVideoById/id/"+id+"/"+name,
+      success:function (date) {
+        if (date.status === 200){
+          _confirm_success(date.message);
+          $('#table-video').bootstrapTable('refresh');
+          return;
+        }
+        _confirm_error(date.message);
+      }
+    });
+  }
+
+  function deleVideoAll() {
+    var selected = $("#table-video").bootstrapTable('getSelections');
+    var selected_length = selected.length;
+    if (!selected_length) {
+      _confirm_error('请勾选需要删除的视频！');
+      return;
+    }
+    var ids = "";
+    var names="";
+    for (var i = 0; i < selected_length; i++) {
+      ids += selected[i].video_id;
+      if (i !== (selected_length - 1)) ids += ",";
+    }
+    for (var k = 0; k < selected_length; k++) {
+      names += selected[k].video_name;
+      if (k !== (selected_length - 1)) names += ",";
+    }
+    _confirm_common({
+      text: "确定删除选中的视频？",
+      confirmButtonText: "确定删除"
+    }, function() {
+      $.post('/resource/deleteVideoByIds/id', { "ids": ids,"names":names}, function(r) {
+        if (r.status === 200) {
+          _confirm_success(r.message);
+          $('#table-video').bootstrapTable('refresh');
+        } else {
+          _confirm_error(r.message);
+        }
+      });
+    });
+  }
+
+  function showVideo() {
+    var a= $('#table-video').bootstrapTable('getSelections');
+    if(a.length!==1){
+      _confirm_error("请选中一行");
+      return;
+    }
+    const videoUrl = a[0].video_url;
+    swal({
+      title: '<strong>视频详情</strong>',
+      type: 'info',
+      html:'<video controls style="width: 460px" src="'+videoUrl+'"></video>',
+      showCloseButton: true,
+      showCancelButton: true,
+      focusConfirm: false,
+    })
+  }
+</script>

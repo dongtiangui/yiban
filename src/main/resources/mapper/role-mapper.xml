@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.yiban_application.system.dao.RoleInterface">
+
+    <resultMap id="BaseResultMap" type="com.yiban.yiban_application.javabean.Role">
+        <result column="role_id"  property="role_id" />
+        <result column="role_name"  property="role_name" />
+        <result column="remark"  property="remark" />
+        <result column="createTime" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+    
+    <select id="findUserRole" resultMap="BaseResultMap">
+        select r.* from t_role r
+                            left join t_admin_role ur on(r.role_id = ur.role_id)
+                            left join t_sys_admin u on(u.admin_id = ur.t_admin_id)
+        where u.admin_name = #{userName}
+    </select>
+    
+    <select id="findById" resultMap="BaseResultMap">
+        select r.role_id roleId,r.role_name role_name,r.remark,
+               rm.auth_id menuId from t_role r
+              left join t_role_auth rm on(r.role_id = rm.role_id)
+        where r.role_id = #{roleId}
+    </select>
+    
+</mapper>

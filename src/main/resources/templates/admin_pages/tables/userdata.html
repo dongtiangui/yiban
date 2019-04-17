@@ -1,0 +1,118 @@
+
+<style>
+  #table  thead{background: #5488c4;}
+  #table tr:nth-child(even){
+    background:#f4f8fb;
+  }
+</style>
+<section class="content-header">
+  <h1>
+    用户管理
+    <small>user admin</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-dashboard"></i> 控制台</a></li>
+    <li class="active">用户管理</li>
+  </ol>
+</section>
+<section class="content">
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box">
+        <div class="box-header">
+          <h3 class="box-title">User Info</h3>
+        </div>
+        <div class="box-body">
+          <table id="table" class="table table-hover"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="../../../static/common.js" type="text/javascript"></script>
+
+<script>
+  $('#table').bootstrapTable({
+    url: '/ajaxUser',
+    method: 'get',
+    striped: true,
+    cache: false,
+    toolbar: "#toolbar",
+    pagination: true,
+    sortable: false,
+    sidePagination: "server",
+    pageNumber: 1,
+    pageSize: 10,
+    pageList: [5, 10, 25, 50, 100],
+    minimumCountColumns: 2,
+    clickToSelect: true,
+    uniqueId: "assess_id",
+    cardView: false,
+    detailView: false,
+    smartDisplay: false,
+    search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+    strictSearch: true,
+    showColumns: true,                  //是否显示所有的列
+    showRefresh: true,
+    queryParams : function (params) {
+      return {
+        pageSize: params.limit,
+        pageNum: params.offset / params.limit + 1,   //页码
+      };
+    },
+    columns: [{
+      checkbox: true,
+      visible: true                  //是否显示复选框
+    },{
+      title: '主键ID',
+      field: 'id',
+      align: 'center',
+      sortable: true,
+    }, {
+      field: 'yb_usernick',
+      title: '易班昵称',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'yb_schoolname',
+      title: '学校',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'yb_money',
+      title: '用户易班网薪',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'yb_regtime',
+      title: '用户易班注册时间',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'yb_userhead',
+      title: '用户易班头像',
+      sortable: true,
+      align: 'center',
+      formatter: function (value, row, index) {
+        return "<img style='height: 64px;width: 64px' src='"+value+"' alt='用户头像'>";
+      }
+    }, {
+      field: 'yb_usertrends',
+      title: '用户动态数',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'yb_userassess',
+      title: '用户评论数',
+      sortable: true,
+      align: 'center'
+    }, {
+      field: 'role.role_name',
+      title: '角色名',
+      sortable: true,
+      align: 'center'
+    }
+    ]
+  });
+</script>

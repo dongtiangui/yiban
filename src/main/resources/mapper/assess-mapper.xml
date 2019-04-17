@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.yiban_application.system.dao.AssessMapper">
+    <resultMap id="BaseResultMap" type="com.yiban.yiban_application.javabean.Wall_assess">
+        <id property="assess_id" column="assess_id"/>
+        <result property="assess_info" column="assess_info"/>
+        <result property="assess_user" column="assess_user"/>
+        <result property="assess_number" column="assess_number"/>
+        <result property="assess_status" column="assess_status"/>
+        <result property="assess_time" column="assess_time"/>
+        <association property="wall_trends" column="assess_trends_id">
+            <id column="trends_id" property="trends_id"/>
+            <result column="trends_info" property="trends_info"/>
+            <result column="trends_img" property="trends_img"/>
+            <result column="trends_video" property="trends_video"/>
+            <result column="trends_outtime" property="trends_outtime"/>
+            <result column="trends_status" property="trends_status"/>
+            <result column="trends_praise_number" property="trends_praise_number"/>
+            <result column="trends_grand_user" property="trends_grand_user"/>
+            <result column="trends_head" property="trends_head"/>
+        </association>
+    </resultMap>
+    
+    <select id="assessAll" resultMap="BaseResultMap">
+        select a.assess_id assess_id,a.assess_info assess_info,a.assess_status assess_status,
+               a.assess_trends_id assess_trends_id,a.assess_user assess_user,
+               a.assess_time assess_time,
+               t.trends_id trends_id,t.trends_info trends_info,t.trends_img trends_img,
+               t.trends_video trends_video,t.trends_outtime trends_outtime,
+               t.trends_status trends_status,t.trends_praise_number trends_praise_number,
+               t.trends_user trends_user,t.trends_type trends_type,t.trends_head trends_head
+        from
+            t_wall_assess a,t_wall_trends t  order by assess_id desc
+    </select>
+    
+    <select id="assessAllByTrends" resultMap="BaseResultMap">
+        
+        select a.assess_id assess_id,a.assess_info assess_info,a.assess_status assess_status,
+          a.assess_trends_id assess_trends_id,a.assess_user assess_user,
+          a.assess_time assess_time,
+          t.trends_id trends_id,t.trends_info trends_info,t.trends_img trends_img,
+         t.trends_video trends_video,t.trends_outtime trends_outtime,
+         t.trends_status trends_status,t.trends_praise_number trends_praise_number,
+         t.trends_user trends_user,t.trends_type trends_type,t.trends_head trends_head
+         from
+       t_wall_assess a,t_wall_trends t
+       where a.assess_trends_id=t.trends_id
+       and trends_id=#{trends_id}
+        
+    </select>
+    
+    <select id="assessConut" resultType="java.lang.Integer">
+        
+        select count(*) from t_wall_assess
+        
+    </select>
+    
+    <select id="assessConutByUser" resultType="java.lang.Integer" parameterType="java.lang.String">
+      
+      select count(*) from t_wall_assess where assess_user=#{user_id}
+      
+    </select>
+
+    <insert id="insertWallAssess" parameterType="com.yiban.yiban_application.javabean.Wall_assess">
+
+        INSERT INTO t_wall_assess(assess_info, assess_user, assess_number, assess_status, assess_trends_id) VALUES
+         (#{assess_info},#{assess_user},#{assess_number},#{assess_status},#{wall_trends.trends_id})
+
+    </insert>
+
+    <update id="updateAssess" parameterType="com.yiban.yiban_application.javabean.Wall_assess">
+
+        UPDATE t_wall_assess SET assess_number= #{assess_number} WHERE assess_trends_id= #{wall_trends.trends_id}
+
+    </update>
+    
+    <delete id="delAssessById">
+    
+        delete from t_wall_assess where assess_id=#{id}
+        
+    </delete>
+    
+</mapper>

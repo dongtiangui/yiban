@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.yiban_application.system.dao.LogInterface">
+    <resultMap id="BaseResultMap" type="com.yiban.yiban_application.javabean.SysLog">
+        <result column="id" jdbcType="DECIMAL" property="id" />
+        <result column="username" jdbcType="VARCHAR" property="username" />
+        <result column="operation" jdbcType="VARCHAR" property="operation" />
+        <result column="time" jdbcType="DECIMAL" property="time" />
+        <result column="method" jdbcType="VARCHAR" property="method" />
+        <result column="params" jdbcType="VARCHAR" property="params" />
+        <result column="ip_address" jdbcType="VARCHAR" property="ip" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="location" property="location"/>
+    </resultMap>
+
+    <insert id="insertLog" parameterType="com.yiban.yiban_application.javabean.SysLog">
+
+        INSERT INTO t_sys_log(id,username, operation,time,method, params, ip_address, create_time, location)
+
+         VALUES (#{id},#{username},#{operation},#{time},#{method},#{params},#{ip},#{createTime},#{location})
+
+    </insert>
+
+    <select id="getAllLog" resultMap="BaseResultMap">
+
+        SELECT id, username, operation, time, method, params, ip_address, create_time, location FROM t_sys_log order by id desc
+
+    </select>
+
+    <select id="getLogByDate" resultType="java.lang.Integer">
+        select count(*) from t_sys_log where create_time like CONCAT('%',#{date},'%')
+    </select>
+    <select id="getLogByOperation" resultType="java.lang.Integer">
+
+        select count(*) from t_sys_log where operation = #{operation}
+
+    </select>
+
+</mapper>

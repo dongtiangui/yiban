@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>video</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="../../../static/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../../static/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../../static/bower_components/Ionicons/css/ionicons.min.css">
+    <link rel="stylesheet" href="../../../static/dist/css/skins/_all-skins.min.css">
+    <link rel="stylesheet" href="../../../static/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+    <link href="../../../static/bower_components/bootstrap-fileinput-master/css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="../../../static/index/framework/swiper-4.5.0/dist/css/swiper.min.css" media="all" rel="stylesheet" type="text/css" />
+    <style>
+        html, body {
+            position: relative;
+            height: 100%;
+        }
+        body {
+            background: #eee;
+            font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            color:#000;
+            margin: 0;
+            padding: 0;
+        }
+        .swiper-container {
+            width: 100%;
+            height: 100%;
+        }
+        .swiper-slide {
+            text-align: center;
+            font-size: 18px;
+            background: #fff;
+            /* Center slide text vertically */
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: -webkit-flex;
+            display: flex;
+            -webkit-box-pack: center;
+            -ms-flex-pack: center;
+            -webkit-justify-content: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+        }
+        .swiper-pagination{
+            position: fixed;
+            bottom: 60px;
+            right: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="swiper-container">
+    <div class="swiper-wrapper" th:each="user : ${list}">
+
+        <div class="swiper-slide">
+            <video controls  autoplay="autoplay" loop="loop" th:src="${user.getVideo_url()}" width="100%" height="100%" style="width:100%;height:100%;object-fit: fill" ></video>
+        </div>
+
+    </div>
+    <!-- Add Pagination -->
+    <div class="swiper-pagination">
+        <input id="username" hidden th:value="${user_id}">
+        <a data-toggle="modal" data-target="#exampleModalLong" href="" onclick="return false;"><i class="fa fa-3x fa-plus-circle"></i></a>
+    </div>
+</div>
+<div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">上传视频</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!--<p class="alert alert-danger text-center">目前支持为mp4格式视频添加背景音乐(限aac格式)</p>-->
+            <input id="upload" name="upload" type="file" accept="video/avi|video/mpg|video/mkv|video/mov|video/mp4|video/3gp|video/webm|video/wmv" >
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../../../static/bower_components/jquery/dist/jquery.min.js">
+</script>
+<script src="../../../static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../../../static/index/framework/swiper-4.5.0/dist/js/swiper.min.js"></script>
+<script src="../../../static/index.js"></script>
+<script src="../../../static/bower_components/bootstrap-fileinput-master/js/fileinput.min.js"></script>
+
+<script src="../../../static/bower_components/bootstrap-fileinput-master/js/plugins/piexif.min.js"></script>
+<!-- optionally if you need a theme like font awesome theme you can include it as mentioned below -->
+<script src="../../../static/bower_components/bootstrap-fileinput-master/themes/fa/theme.js"></script>
+<!-- optionally if you need translation for your language then include  locale file as mentioned below -->
+<script src="../../../static/bower_components/bootstrap-fileinput-master/js/locales/zh.js"></script>
+<script>
+    $(function () {
+        var imgurl = "";
+        $("#upload").fileinput({
+            language: 'zh',
+            uploadAsync: true,
+            showPreview : true,
+            showCaption:true,
+            autoReplace:false,
+            uploadUrl:'/file/image?username='+$('#username').val()+'',
+            browseLabel: '上传小视频',
+            previewFileIcon: '<i class="fa fa-3x fa-file"></i>',
+            showUpload: true, //是否显示上传按钮
+            showRemove : true, //显示移除按钮
+            browseClass: "btn btn-primary", //按钮样式
+            dropZoneEnabled: false,//是否显示拖拽区域
+            maxFileCount: 1, //表示允许同时上传的最大文件个数
+            enctype: 'multipart/form-data',
+            validateInitialCount:true,
+            msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+            allowedFileExtensions: ['avi','m4v','mpg','mkv','mov','mp4','3gp','webm','wmv','mp3','wav'],
+            allowedFileTypes: ['video','audio'],
+            previewFileIconSettings: {
+                'mov': '<i class="fas fa-file-video text-warning"></i>',
+                'mp3': '<i class="fas fa-file-audio text-warning"></i>',
+            },
+            previewFileExtSettings: {
+                'mov': function(ext) {
+                    return ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv|m4v)$/i);
+                },
+                'mp3': function(ext) {
+                    return ext.match(/(mp3|wav)$/i);
+                }
+            }
+        });
+        $("#upload").on("fileuploaded", function (event, data, previewId, index) {
+            var  response =  data.response;
+            imgurl+=response.filePath+',';
+            $("#url").val(imgurl);
+
+        });
+//上传前
+        $('#upload').on('filebatchuploadsuccess', function(event, data, previewId, index) {
+            var form = data.form, files = data.files, extra = data.extra,
+                response = data.response, reader = data.reader;
+        });
+    });
+
+    $(function () {
+        new Swiper('.swiper-container', {
+            direction: 'vertical',
+            lazy: {
+                loadPrevNext: true
+            },
+            on: {
+                slideChangeTransitionEnd: function(){
+                    var fist = document.getElementsByTagName('video')[this.activeIndex-1];   //获取视频video
+                    var sec = document.getElementsByTagName('video')[this.activeIndex+1];
+                    fist.currentTime = 0;
+                    fist.pause();
+                    sec.currentTime = 0;
+                    sec.pause();
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

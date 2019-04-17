@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.yiban_application.system.dao.PrintInterface">
+    <resultMap id="BaseResultMap" type="com.yiban.yiban_application.javabean.Print">
+        <id property="print_id" column="print_id"/>
+        <result property="print_name" column="print_name"/>
+        <result property="print_parm" column="print_parm"/>
+        <result property="print_url" column="print_url"/>
+        <result property="print_number" column="print_number"/>
+        <result property="print_local" column="print_local"/>
+        <result property="print_file" column="print_file"/>
+        <result property="print_fomat" column="print_fomat"/>
+        <result property="print_color" column="print_color"/>
+        <result property="print_time" column="print_time"/>
+        <result property="print_status" column="print_status"/>
+        <association property="printLocal" column="print_local_id">
+            <id property="t_local_id" column="t_local_id"/>
+            <result property="t_local_name" column="t_local_name"/>
+            <result property="t_local_person" column="t_local_person"/>
+            <result property="t_local_number" column="t_local_number"/>
+            <result property="t_local_host" column="t_local_host"/>
+        </association>
+    </resultMap>
+    <select id="selectPrint" resultMap="BaseResultMap">
+
+       select p.print_id print_id, p.print_name print_name,
+              p.print_parm print_parm, p.print_url print_url,
+              p.print_number print_number, p.print_local print_local,
+              p.print_local_id print_local_id, p.print_file print_file,
+              p.print_fomat print_fomat, p.print_color print_color,
+              p.print_time print_time,p.print_status print_status,
+              l.t_local_id t_local_id,l.t_local_name t_local_name,l.t_local_number t_local_number,l.t_local_host t_local_host
+       from t_print p,t_local l where p.print_local_id = l.t_local_id order by print_id desc
+
+    </select>
+
+   
+    <insert id="insertPrint" parameterType="com.yiban.yiban_application.javabean.Print">
+        INSERT INTO t_print(print_name, print_parm, print_url, print_number, print_local, print_local_id, print_file, print_fomat, print_color, print_time,print_status)
+        VALUES (#{print_name},#{print_parm},#{print_url},#{print_number},#{print_local},#{printLocal.t_local_id},#{print_file},#{print_fomat},#{print_color},#{print_time},#{print_status})
+    </insert>
+
+    <update id="UpdatePrintStatus">
+
+        UPDATE t_print SET print_status= #{status} WHERE print_id= #{id}
+
+    </update>
+    
+    <delete id="deleteById">
+        delete from t_print where print_id=#{id}
+
+    </delete>
+
+</mapper>
